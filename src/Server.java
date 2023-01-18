@@ -9,14 +9,23 @@ import java.util.ArrayList;
 public class Server implements Runnable {
 
     private ArrayList<ConnectionHandler> connections;
+    private ServerSocket server;
+    private boolean done;
+
+    public Server() {
+        connections = new ArrayList<>();
+        done = false;
+    }
 
     @Override
     public void run() {
         try {
-            ServerSocket server = new ServerSocket(9999);
-            Socket client = server.accept();
-            ConnectionHandler handler = new ConnectionHandler(client);
-            connections.add(handler);
+            server = new ServerSocket(9999);
+            while (!done) {
+                Socket client = server.accept();
+                ConnectionHandler handler = new ConnectionHandler(client);
+                connections.add(handler);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -27,6 +36,16 @@ public class Server implements Runnable {
             if (ch != null) {
                 ch.sendMassage(message);
             }
+        }
+    }
+
+    public void shutdown() throws IOException {
+        done = true;
+        if (!server.isClosed()) {
+            server.close();
+        }
+        for (ConnectionHandler ch : connections) {
+            ch.shutdown();
         }
     }
 
@@ -50,6 +69,22 @@ public class Server implements Runnable {
                 nickname = in.readLine();
                 System.out.println(nickname + " connected!");
                 broadcast(nickname + "joined the chat!");
+                String message;
+                while ((message = in.readLine()) != null) {
+                    if (message.startsWith("/nick ")) {
+                        String[] messageSplit = message.split(" ", 2);
+                        if (messageSplit.length == 2) {
+                            broadcast(nickname + " renamed themselves to " + messageSplit[1]);
+                            System.out.println(nickname + " renamed themselves to " + messageSplit[1]);
+                            nickname = messageSplit[1];
+                            out.println("Successfully changed name for " + nickname);
+                        }
+                    } else if (message.startsWith("/quit")) {
+                        out.println("No nickname provided!");
+                    } else {
+                        broadcast(nickname + ": " + message);
+                    }
+                }
             } catch (IOException e) {
                 //
             }
@@ -57,6 +92,14 @@ public class Server implements Runnable {
 
         public void sendMassage(String message) {
             out.println(message);
+        }
+
+        public void shutdown() throws IOException {
+            in.close();
+            out.close();
+            if (!client.isClosed()) {
+                client.close();
+            }
         }
     }
 }
