@@ -24,15 +24,19 @@ public class Server implements Runnable {
     public void run() {
         try {
             server = new ServerSocket(9999);
-            pool = Executors.newCachedThreadPool()
+            pool = Executors.newCachedThreadPool();
             while (!done) {
                 Socket client = server.accept();
                 ConnectionHandler handler = new ConnectionHandler(client);
                 connections.add(handler);
                 pool.execute(handler);
             }
-        } catch (IOException e) {
-            shutdown();
+        } catch (Exception e) {
+            try {
+                shutdown();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -94,7 +98,11 @@ public class Server implements Runnable {
                     }
                 }
             } catch (IOException e) {
-                shutdown();
+                try {
+                    shutdown();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
 
