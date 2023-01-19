@@ -19,4 +19,18 @@ public class Client implements Runnable{
 
         }
     }
+    class Inputhandler implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
+                while (!done) {
+
+                }
+            } catch (IOException e) {
+                //TODO
+            }
+        }
+    }
 }
