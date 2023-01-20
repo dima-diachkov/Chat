@@ -21,7 +21,10 @@ public class Client implements Runnable{
             Thread t = new Thread(inHandler);
             t.start();
 
-
+            String inMessage;
+            while ((inMessage = in.readLine()) != null) {
+                System.out.println(inMessage);
+            }
         } catch (IOException e) {
 
         }
