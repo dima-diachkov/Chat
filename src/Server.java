@@ -50,6 +50,7 @@ public class Server implements Runnable {
 
     public void shutdown() throws IOException {
         done = true;
+        pool.shutdown();
         if (!server.isClosed()) {
             server.close();
         }
