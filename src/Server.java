@@ -81,17 +81,7 @@ public class Server implements Runnable {
                 broadcast(nickname + "joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
-                    if (message.startsWith("/nick ")) {
-                        String[] messageSplit = message.split(" ", 2);
-                        if (messageSplit.length == 2) {
-                            broadcast(nickname + " renamed themselves to " + messageSplit[1]);
-                            System.out.println(nickname + " renamed themselves to " + messageSplit[1]);
-                            nickname = messageSplit[1];
-                            out.println("Successfully changed name for " + nickname);
-                        } else {
-                            out.println("No nickname provided!");
-                        }
-                    } else if (message.startsWith("/quit")) {
+                    if (message.startsWith("/quit")) {
                         broadcast(nickname + " left the chat!");
                         shutdown();
                     } else {
@@ -119,6 +109,7 @@ public class Server implements Runnable {
             }
         }
     }
+
     public static void main(String[] args) {
         Server server = new Server();
         server.run();

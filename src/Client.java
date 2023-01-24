@@ -17,7 +17,7 @@ public class Client implements Runnable{
             out = new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            Inputhandler inHandler = new Inputhandler();
+            InputHandler inHandler = new InputHandler();
             Thread t = new Thread(inHandler);
             t.start();
 
@@ -42,7 +42,7 @@ public class Client implements Runnable{
             //ignored
         }
     }
-    class Inputhandler implements Runnable {
+    class InputHandler implements Runnable {
 
         @Override
         public void run() {
