@@ -23,7 +23,7 @@ public class Server implements Runnable {
     @Override
     public void run() {
         try {
-            server = new ServerSocket(9999);
+            server = new ServerSocket(7778 );
             pool = Executors.newCachedThreadPool();
             while (!done) {
                 Socket client = server.accept();
@@ -40,13 +40,6 @@ public class Server implements Runnable {
         }
     }
 
-    public void broadcast(String message) {
-        for (ConnectionHandler ch : connections) {
-            if (ch != null) {
-                ch.sendMassage(message);
-            }
-        }
-    }
 
     public void shutdown() throws IOException {
         done = true;
@@ -78,14 +71,14 @@ public class Server implements Runnable {
                 out.println("Please enter a nickname: ");
                 nickname = in.readLine();
                 System.out.println(nickname + " connected!");
-                broadcast(nickname + "joined the chat!");
+                sendToAll(nickname + " joined the chat!");
                 String message;
                 while ((message = in.readLine()) != null) {
                     if (message.startsWith("/quit")) {
-                        broadcast(nickname + " left the chat!");
+                        sendToAll(nickname + " left the chat!");
                         shutdown();
                     } else {
-                        broadcast(nickname + ": " + message);
+                        sendToAll(nickname + ": " + message);
                     }
                 }
             } catch (IOException e) {
@@ -93,6 +86,13 @@ public class Server implements Runnable {
                     shutdown();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
+                }
+            }
+        }
+        public void sendToAll(String message) {
+            for (ConnectionHandler ch : connections) {
+                if (ch != null) {
+                    ch.sendMassage(message);
                 }
             }
         }
